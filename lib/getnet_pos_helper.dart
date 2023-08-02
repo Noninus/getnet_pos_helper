@@ -1,7 +1,7 @@
 import 'package:flutter/services.dart';
 
 class GetnetPos {
-  static const MethodChannel _channel = const MethodChannel('getnet_pos');
+  static const MethodChannel _channel = MethodChannel('getnet_pos');
 
   /// Print a list of strings.
   /// Uses the qrCodePattern to match the qrCode. If matches the qrcode is printed.
@@ -10,7 +10,7 @@ class GetnetPos {
     List<String> list, {
     String qrCodePattern = '(\\d{44}\\|.*\$)',
     String barcodePattern = '^\\d{1,}.\$',
-    bool printBarcode = true,
+    bool printBarcode = false,
   }) async =>
       await _channel.invokeMethod('print', {
         'list': list,
@@ -33,6 +33,6 @@ class GetnetPos {
     String falseMessage = 'Off',
   }) async {
     var initiated = await _channel.invokeMethod('check');
-    return "$label: " + (initiated ? "$trueMessage" : "$falseMessage");
+    return "$label: ${initiated ? trueMessage : falseMessage}";
   }
 }

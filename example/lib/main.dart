@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:getnet_pos_helper/getnet_pos_helper.dart';
 
-void main() => runApp(MyApp());
+void main() => runApp(const MyApp());
 
 class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -11,21 +13,21 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: MyHomePage(title: 'Teste GetNet'),
+      home: const MyHomePage(title: 'Teste GetNet'),
     );
   }
 }
 
 class MyHomePage extends StatefulWidget {
-  MyHomePage({Key? key, required this.title}) : super(key: key);
+  const MyHomePage({Key? key, required this.title}) : super(key: key);
 
   final String title;
 
   @override
-  _MyHomePageState createState() => _MyHomePageState();
+  MyHomePageState createState() => MyHomePageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
+class MyHomePageState extends State<MyHomePage> {
   String? serviceStatus;
 
   String? printerStatus;
@@ -64,23 +66,23 @@ class _MyHomePageState extends State<MyHomePage> {
           children: <Widget>[
             FloatingActionButton(
               onPressed: nfc,
-              child: Icon(Icons.airplay),
+              child: const Icon(Icons.airplay),
             ),
-            SizedBox(
+            const SizedBox(
               width: 10,
             ),
             FloatingActionButton(
               onPressed: scan,
               backgroundColor: Colors.red[900],
-              child: Icon(Icons.camera_alt),
+              child: const Icon(Icons.camera_alt),
             ),
-            SizedBox(
+            const SizedBox(
               width: 10,
             ),
             FloatingActionButton(
               onPressed: impressao,
               backgroundColor: Colors.green[900],
-              child: Icon(Icons.print),
+              child: const Icon(Icons.print),
             ),
           ],
         ),
@@ -98,7 +100,6 @@ class _MyHomePageState extends State<MyHomePage> {
         "Content line 1",
         "Content line 2",
       ],
-      printBarcode: false, //default is true
     )
         .then((_) => setState(() {
               printerStatus = 'Normal';
@@ -112,7 +113,7 @@ class _MyHomePageState extends State<MyHomePage> {
     setState(() {
       mifareStatus = 'Mantenha o cartão próximo!';
     });
-    Future.delayed(Duration(seconds: 2), () {
+    Future.delayed(const Duration(seconds: 2), () {
       GetnetPos.getMifareCardSN()
           .then((csn) => setState(() {
                 mifareStatus = 'Leitura: $csn';
@@ -163,12 +164,12 @@ class LabeledValue extends StatelessWidget {
           text: label,
           style: Theme.of(context)
               .textTheme
-              .caption
+              .bodySmall
               ?.copyWith(fontWeight: FontWeight.bold),
           children: [
             TextSpan(
               text: value,
-              style: Theme.of(context).textTheme.caption,
+              style: Theme.of(context).textTheme.bodySmall,
             ),
           ],
         ),
