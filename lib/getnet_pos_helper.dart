@@ -35,4 +35,14 @@ class GetnetPos {
     var initiated = await _channel.invokeMethod('check');
     return "$label: ${initiated ? trueMessage : falseMessage}";
   }
+
+  /// Try to make payment
+  static Future<String> payment(
+          String amount, String paymentType, String callerId) async =>
+      await _channel.invokeMethod('payment', {
+        'amount': amount,
+        // 'creditType': creditType, não precisa enviar caso não for parcelado
+        'paymentType': paymentType,
+        'callerId': callerId
+      });
 }

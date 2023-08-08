@@ -22,20 +22,44 @@ import io.flutter.plugin.common.MethodChannel.MethodCallHandler;
 import io.flutter.plugin.common.MethodChannel.Result;
 import io.flutter.plugin.common.PluginRegistry.Registrar;
 
+import android.content.Intent;
+import android.os.Bundle;
+import android.net.Uri;
+
+import io.flutter.embedding.engine.plugins.activity.ActivityAware;
+import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding;
+import io.flutter.embedding.engine.plugins.FlutterPlugin;
+import android.app.Activity;
+import androidx.annotation.NonNull;
+import android.util.Log;
+
 /**
  * GetnetPosHelperPlugin
  */
-public class GetnetPosHelperPlugin implements MethodCallHandler {
+public class GetnetPosHelperPlugin implements FlutterPlugin, MethodCallHandler, ActivityAware {
+
+    private Activity activity;
+    private static MethodChannel channel;
 
     private static final Logger LOGGER = Logger.getLogger(GetnetPosHelperPlugin.class.getName());
     private static final String QR_CODE_PATTERN = "qrCodePattern";
     private static final String BARCODE_PATTERN = "barcodePattern";
     private static final String PRINT_BARCODE = "printBarcode";
     private static final String LIST = "list";
-    private Context context;
+    private static Context context;
 
-    private GetnetPosHelperPlugin(Context context) {
-        this.context = context;
+    private final int REQUEST_CODE = 1001;
+    private final String ARG_RESULT = "result";
+    private final String ARG_RESULT_DETAILS = "resultDetails";
+    private final String ARG_AMOUNT = "amount";
+    private final String ARG_TYPE = "type";
+    private final String ARG_INPUT_TYPE = "inputType";
+    private final String ARG_INSTALLMENTS = "installments";
+    private final String ARG_NSU = "nsu";
+    private final String ARG_BRAND = "brand";
+
+
+    public GetnetPosHelperPlugin() {
         registerPosDigital(new Callback() {
             @Override
             public void performAction() {
@@ -53,8 +77,48 @@ public class GetnetPosHelperPlugin implements MethodCallHandler {
      * Plugin registration.
      */
     public static void registerWith(Registrar registrar) {
-        final MethodChannel channel = new MethodChannel(registrar.messenger(), "getnet_pos");
-        channel.setMethodCallHandler(new GetnetPosHelperPlugin(registrar.context()));
+        channel = new MethodChannel(registrar.messenger(), "getnet_pos");
+        context = registrar.context();
+        channel.setMethodCallHandler(new GetnetPosHelperPlugin());
+    }
+
+    @Override
+    public void onAttachedToEngine(@NonNull FlutterPluginBinding flutterPluginBinding) {
+        channel = new MethodChannel(flutterPluginBinding.getFlutterEngine().getDartExecutor(), "getnet_pos");
+        channel.setMethodCallHandler(this);
+
+        // final MethodChannel channel = new MethodChannel(registrar.messenger(), "getnet_pos");
+        // channel.setMethodCallHandler(new GetnetPosHelperPlugin());
+        //context = flutterPluginBinding.applicationContext;
+    }
+
+    @Override
+    public void onDetachedFromEngine(@NonNull FlutterPluginBinding binding) {
+        // channel.setMethodCallHandler(null);
+        // channel = null;
+    }
+
+    @Override
+    public void onAttachedToActivity(ActivityPluginBinding activityPluginBinding) {
+        // TODO: your plugin is now attached to an Activity
+        this.activity = activityPluginBinding.getActivity();
+        handleDeepLinkResponse(this.activity.getIntent());
+    }
+
+    @Override
+    public void onDetachedFromActivityForConfigChanges() {
+        // TODO: the Activity your plugin was attached to was destroyed to change configuration.
+        // This call will be followed by onReattachedToActivityForConfigChanges().
+    }
+
+    @Override
+    public void onReattachedToActivityForConfigChanges(ActivityPluginBinding activityPluginBinding) {
+        // TODO: your plugin is now attached to a new Activity after a configuration change.
+    }
+
+    @Override
+    public void onDetachedFromActivity() {
+        // TODO: your plugin is no longer associated with an Activity. Clean up references.
     }
 
     /**
@@ -110,6 +174,7 @@ public class GetnetPosHelperPlugin implements MethodCallHandler {
         getMifare(call, result, 10);
         scanner(call, result);
         checkService(call, result);
+        payment(call, result);
     }
 
     /**
@@ -129,6 +194,31 @@ public class GetnetPosHelperPlugin implements MethodCallHandler {
             }
             result.success(initiated);
         }
+    }
+
+    /**
+     * Make payment
+     *
+     * @param call   - method call
+     * @param result - result callback
+     */
+    private void payment(MethodCall call, Result result) {
+        if (call.method.equals("payment")) {
+            Bundle bundle = new Bundle();
+            bundle.putString("amount", call.argument("amount"));
+            bundle.putString("paymentType", call.argument("paymentType"));
+            bundle.putString("callerId", call.argument("callerId"));
+            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("getnet://pagamento/v3/payment"));
+            intent.putExtras(bundle);
+            activity.startActivityForResult(intent, REQUEST_CODE);
+            result.success(true);
+        }
+    }
+
+    private void handleDeepLinkResponse(Intent intent) {
+        Log.v("SendDeeplinkPayment", "handleDeepLinkResponse");
+        channel.invokeMethod("checkoutCallback", intent.toString());
+        
     }
 
     /**

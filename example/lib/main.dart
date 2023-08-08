@@ -84,6 +84,14 @@ class MyHomePageState extends State<MyHomePage> {
               backgroundColor: Colors.green[900],
               child: const Icon(Icons.print),
             ),
+            const SizedBox(
+              width: 10,
+            ),
+            FloatingActionButton(
+              onPressed: payment,
+              backgroundColor: Colors.orange[900],
+              child: const Icon(Icons.credit_card),
+            ),
           ],
         ),
       ),
@@ -101,6 +109,20 @@ class MyHomePageState extends State<MyHomePage> {
         "Content line 2",
       ],
     )
+        .then((_) => setState(() {
+              printerStatus = 'Normal';
+            }))
+        .catchError((e) => setState(() {
+              printerStatus = 'Error: ${e.code} -> ${e.message}';
+            }));
+  }
+
+  void payment() {
+    setState(() {
+      printerStatus = null;
+    });
+    //Amount: 12 digitos os ultimos 2 casas decimais
+    GetnetPos.payment("000000001234", "credit", "1")
         .then((_) => setState(() {
               printerStatus = 'Normal';
             }))
