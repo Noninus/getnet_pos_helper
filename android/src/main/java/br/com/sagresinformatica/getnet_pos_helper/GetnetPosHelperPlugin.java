@@ -33,10 +33,12 @@ import android.app.Activity;
 import androidx.annotation.NonNull;
 import android.util.Log;
 
+import io.flutter.plugin.common.PluginRegistry.NewIntentListener;
+
 /**
  * GetnetPosHelperPlugin
  */
-public class GetnetPosHelperPlugin implements FlutterPlugin, MethodCallHandler, ActivityAware {
+public class GetnetPosHelperPlugin implements ActivityAware, FlutterPlugin, MethodCallHandler  {
 
     private Activity activity;
     private static MethodChannel channel;
@@ -58,67 +60,47 @@ public class GetnetPosHelperPlugin implements FlutterPlugin, MethodCallHandler, 
     private final String ARG_NSU = "nsu";
     private final String ARG_BRAND = "brand";
 
-
-    public GetnetPosHelperPlugin() {
-        registerPosDigital(new Callback() {
-            @Override
-            public void performAction() {
-                LOGGER.info("Initialized!");
-            }
-
-            @Override
-            public void onError(String message) {
-                LOGGER.log(Level.SEVERE, message);
-            }
-        });
-    }
-
-    /**
-     * Plugin registration.
-     */
-    public static void registerWith(Registrar registrar) {
-        channel = new MethodChannel(registrar.messenger(), "getnet_pos");
-        context = registrar.context();
-        channel.setMethodCallHandler(new GetnetPosHelperPlugin());
-    }
-
     @Override
     public void onAttachedToEngine(@NonNull FlutterPluginBinding flutterPluginBinding) {
+        context = flutterPluginBinding.getApplicationContext();
         channel = new MethodChannel(flutterPluginBinding.getFlutterEngine().getDartExecutor(), "getnet_pos");
         channel.setMethodCallHandler(this);
-
-        // final MethodChannel channel = new MethodChannel(registrar.messenger(), "getnet_pos");
-        // channel.setMethodCallHandler(new GetnetPosHelperPlugin());
-        //context = flutterPluginBinding.applicationContext;
     }
 
     @Override
     public void onDetachedFromEngine(@NonNull FlutterPluginBinding binding) {
-        // channel.setMethodCallHandler(null);
-        // channel = null;
+        channel.setMethodCallHandler(null);
+        channel = null;
     }
 
     @Override
     public void onAttachedToActivity(ActivityPluginBinding activityPluginBinding) {
-        // TODO: your plugin is now attached to an Activity
         this.activity = activityPluginBinding.getActivity();
+        activityPluginBinding.addOnNewIntentListener(new NewIntentListener() {
+            @Override
+            public boolean onNewIntent(Intent intent) {
+                LOGGER.log(Level.SEVERE, "onNewIntent");
+                handleDeepLinkResponse(intent);
+                return false;
+                // Lógica a ser executada quando um novo intent for recebido
+            }
+        });
         handleDeepLinkResponse(this.activity.getIntent());
     }
-
+  
     @Override
     public void onDetachedFromActivityForConfigChanges() {
-        // TODO: the Activity your plugin was attached to was destroyed to change configuration.
-        // This call will be followed by onReattachedToActivityForConfigChanges().
+      this.activity = null;
     }
 
     @Override
     public void onReattachedToActivityForConfigChanges(ActivityPluginBinding activityPluginBinding) {
-        // TODO: your plugin is now attached to a new Activity after a configuration change.
+       onAttachedToActivity(activityPluginBinding);
     }
 
     @Override
     public void onDetachedFromActivity() {
-        // TODO: your plugin is no longer associated with an Activity. Clean up references.
+        this.activity = null;
     }
 
     /**
@@ -145,12 +127,12 @@ public class GetnetPosHelperPlugin implements FlutterPlugin, MethodCallHandler, 
             PosDigital.register(context, new PosDigital.BindCallback() {
                 @Override
                 public void onError(Exception e) {
-                    LOGGER.log(Level.SEVERE, e.getMessage(), e);
                     callback.onError(e.getMessage());
                 }
 
                 @Override
                 public void onConnected() {
+                    LOGGER.log(Level.SEVERE, "onConnected");
                     try {
                         callback.performAction();
                     } catch (Exception e) {
@@ -164,6 +146,7 @@ public class GetnetPosHelperPlugin implements FlutterPlugin, MethodCallHandler, 
                 }
             });
         } catch (Exception e) {
+            LOGGER.log(Level.SEVERE, "Exception e");
             callback.onError("Failure on service initialization" + e.getMessage());
         }
     }
@@ -175,6 +158,7 @@ public class GetnetPosHelperPlugin implements FlutterPlugin, MethodCallHandler, 
         scanner(call, result);
         checkService(call, result);
         payment(call, result);
+        initialize(call, result);
     }
 
     /**
@@ -184,6 +168,7 @@ public class GetnetPosHelperPlugin implements FlutterPlugin, MethodCallHandler, 
      * @param result - result callback
      */
     private void checkService(MethodCall call, Result result) {
+        LOGGER.log(Level.SEVERE, "checkService: ");
         if (call.method.equals("check")) {
             boolean initiated = false;
             try {
@@ -193,6 +178,30 @@ public class GetnetPosHelperPlugin implements FlutterPlugin, MethodCallHandler, 
                 LOGGER.log(Level.SEVERE, "Failure when checking service: " + e.getMessage());
             }
             result.success(initiated);
+        }
+    }
+
+    /**
+     * initialize method
+     *
+     * @param call   - method call
+     * @param result - result callback
+     */
+    private void initialize(MethodCall call, Result result) {
+        LOGGER.log(Level.SEVERE, "initialize");
+        if (call.method.equals("initialize")) {
+            registerPosDigital(new Callback() {
+                @Override
+                public void performAction() {
+                    LOGGER.info("Initialized!");
+                }
+
+                @Override
+                public void onError(String message) {
+                    LOGGER.info("GetnetPosHelperPlugin onError");
+                    LOGGER.log(Level.SEVERE, message);
+                }
+            });
         }
     }
 
@@ -210,12 +219,15 @@ public class GetnetPosHelperPlugin implements FlutterPlugin, MethodCallHandler, 
             bundle.putString("callerId", call.argument("callerId"));
             Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("getnet://pagamento/v3/payment"));
             intent.putExtras(bundle);
+            intent.putExtra("return_scheme", "flutterdeeplinkdemo");
             activity.startActivityForResult(intent, REQUEST_CODE);
+            LOGGER.log(Level.SEVERE, "payment");
             result.success(true);
         }
     }
 
     private void handleDeepLinkResponse(Intent intent) {
+        LOGGER.log(Level.SEVERE, "handleDeepLinkResponse");
         Log.v("SendDeeplinkPayment", "handleDeepLinkResponse");
         channel.invokeMethod("checkoutCallback", intent.toString());
         

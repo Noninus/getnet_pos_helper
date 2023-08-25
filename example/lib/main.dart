@@ -1,5 +1,9 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:getnet_pos_helper/getnet_pos_helper.dart';
+import 'package:getnet_pos_helper/payment_service/payment_response.dart';
 
 void main() => runApp(const MyApp());
 
@@ -36,10 +40,30 @@ class MyHomePageState extends State<MyHomePage> {
 
   String? scannerStatus;
 
+  String? paymentStatus;
+
+  late StreamSubscription subscription;
+
+  initGet() async {
+    await GetnetPos.init();
+    subscription = GetnetPos.checkoutStreamListen
+        .listen((PaymentResponse paymentResponse) {
+      print("===== CALLBACK ${paymentResponse.success} =======");
+      SchedulerBinding.instance.addPostFrameCallback((_) {
+        setState(() {
+          paymentStatus = paymentResponse.message;
+        });
+      });
+    });
+  }
+
   @override
   void initState() {
     super.initState();
-    checkService();
+    initGet();
+
+    // initialize();
+    // checkService();
   }
 
   @override
@@ -52,10 +76,27 @@ class MyHomePageState extends State<MyHomePage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
+            ElevatedButton(
+                onPressed: () => initialize(), child: Text("initialize()")),
+            ElevatedButton(
+                onPressed: () => checkService(), child: Text("checkService()")),
+            ElevatedButton(
+                onPressed: () {
+                  var a = GetnetPos.initReceiveIntent();
+                  print('a: $a');
+                },
+                child: Text("initReceiveIntent()")),
+            ElevatedButton(
+                onPressed: () {
+                  GetnetPos.initReceiveIntentit;
+                  print('b');
+                },
+                child: Text("initReceiveIntentit()")),
             LabeledValue('Service Status', serviceStatus ?? ""),
             LabeledValue('Printer:', printerStatus ?? ""),
             LabeledValue('Mifare:', mifareStatus ?? ""),
             LabeledValue('Scanner:', scannerStatus ?? ""),
+            LabeledValue('paymentStatus:', paymentStatus ?? ""),
           ],
         ),
       ),
@@ -102,7 +143,7 @@ class MyHomePageState extends State<MyHomePage> {
     setState(() {
       printerStatus = null;
     });
-    GetnetPos.print(
+    GetnetPos.printText(
       [
         "Header is the first line",
         "Content line 1",
@@ -122,13 +163,7 @@ class MyHomePageState extends State<MyHomePage> {
       printerStatus = null;
     });
     //Amount: 12 digitos os ultimos 2 casas decimais
-    GetnetPos.payment("000000001234", "credit", "1")
-        .then((_) => setState(() {
-              printerStatus = 'Normal';
-            }))
-        .catchError((e) => setState(() {
-              printerStatus = 'Error: ${e.code} -> ${e.message}';
-            }));
+    GetnetPos.checkout("000000000012", "credit", "1");
   }
 
   void nfc() {
@@ -148,6 +183,13 @@ class MyHomePageState extends State<MyHomePage> {
 
   void checkService() async {
     var status = await GetnetPos.checkService(label: '');
+    setState(() {
+      serviceStatus = status;
+    });
+  }
+
+  void initialize() async {
+    var status = await GetnetPos.initialize();
     setState(() {
       serviceStatus = status;
     });
