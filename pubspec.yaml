@@ -8,7 +8,6 @@ environment:
   flutter: ">=3.3.0"
 
 dependencies:
-  receive_intent: ^0.2.4
   flutter:
     sdk: flutter
   plugin_platform_interface: ^2.0.2

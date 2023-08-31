@@ -77,21 +77,11 @@ class MyHomePageState extends State<MyHomePage> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             ElevatedButton(
-                onPressed: () => initialize(), child: Text("initialize()")),
+                onPressed: () => initialize(),
+                child: const Text("initialize()")),
             ElevatedButton(
-                onPressed: () => checkService(), child: Text("checkService()")),
-            ElevatedButton(
-                onPressed: () {
-                  var a = GetnetPos.initReceiveIntent();
-                  print('a: $a');
-                },
-                child: Text("initReceiveIntent()")),
-            ElevatedButton(
-                onPressed: () {
-                  GetnetPos.initReceiveIntentit;
-                  print('b');
-                },
-                child: Text("initReceiveIntentit()")),
+                onPressed: () => checkService(),
+                child: const Text("checkService()")),
             LabeledValue('Service Status', serviceStatus ?? ""),
             LabeledValue('Printer:', printerStatus ?? ""),
             LabeledValue('Mifare:', mifareStatus ?? ""),

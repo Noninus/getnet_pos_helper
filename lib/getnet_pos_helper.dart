@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:flutter/services.dart';
 import 'package:getnet_pos_helper/payment_service/payment_response.dart';
 import 'package:getnet_pos_helper/payment_service/payment_service.dart';
-import 'package:receive_intent/receive_intent.dart';
 
 class GetnetPos {
   static const MethodChannel _channel = MethodChannel('getnet_pos');
@@ -54,41 +53,10 @@ class GetnetPos {
 
   /// Try to make payment
   static checkout(String amount, String paymentType, String callerId) async {
-    initReceiveIntentit();
     _paymentService.checkout(amount, paymentType, callerId);
   }
 
   /// Stream do checkout
   static Stream<PaymentResponse> get checkoutStreamListen =>
       _paymentService.streamData;
-
-  static Future<Intent?> initReceiveIntent() async {
-    // Platform messages may fail, so we use a try/catch PlatformException.
-    try {
-      final receivedIntent = await ReceiveIntent.getInitialIntent();
-      print(receivedIntent);
-      return receivedIntent;
-
-      // Validate receivedIntent and warn the user, if it is not correct,
-      // but keep in mind it could be `null` or "empty"(`receivedIntent.isNull`).
-    } on PlatformException {
-      // Handle exception
-    }
-  }
-
-  static late StreamSubscription _sub;
-
-  static Future<void> initReceiveIntentit() async {
-    // ... check initialIntent
-
-    // Attach a listener to the stream
-    _sub = ReceiveIntent.receivedIntentStream.listen((Intent? intent) {
-      // Validate receivedIntent and warn the user, if it is not correct,
-      print("LISTENING: ${intent.toString()}");
-    }, onError: (err) {
-      // Handle exception
-    });
-
-    // NOTE: Don't forget to call _sub.cancel() in dispose()
-  }
 }

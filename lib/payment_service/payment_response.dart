@@ -52,23 +52,23 @@ class PaymentResponse {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['code'] = this.code;
-    data['amount'] = this.amount;
-    data['itk'] = this.itk;
-    data['type'] = this.type;
-    data['installmentCount'] = this.installmentCount;
-    data['brand'] = this.brand;
-    data['entryMode'] = this.entryMode;
-    data['atk'] = this.atk;
-    data['pan'] = this.pan;
-    data['authorization_code'] = this.authorizationCode;
-    data['authorization_date_time'] = this.authorizationDateTime;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['code'] = code;
+    data['amount'] = amount;
+    data['itk'] = itk;
+    data['type'] = type;
+    data['installmentCount'] = installmentCount;
+    data['brand'] = brand;
+    data['entryMode'] = entryMode;
+    data['atk'] = atk;
+    data['pan'] = pan;
+    data['authorization_code'] = authorizationCode;
+    data['authorization_date_time'] = authorizationDateTime;
 
-    data['success'] = this.success;
-    data['reason'] = this.reason;
-    data['response_code'] = this.responseCode;
-    data['message'] = this.message;
+    data['success'] = success;
+    data['reason'] = reason;
+    data['response_code'] = responseCode;
+    data['message'] = message;
     return data;
   }
 }

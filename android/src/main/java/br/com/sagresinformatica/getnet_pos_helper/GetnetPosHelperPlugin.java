@@ -219,8 +219,9 @@ public class GetnetPosHelperPlugin implements ActivityAware, FlutterPlugin, Meth
             bundle.putString("callerId", call.argument("callerId"));
             Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("getnet://pagamento/v3/payment"));
             intent.putExtras(bundle);
-            intent.putExtra("return_scheme", "flutterdeeplinkdemo");
-            activity.startActivityForResult(intent, REQUEST_CODE);
+            intent.putExtra("return_scheme", "payment_response");
+            intent.putExtra("urlCallback", "payment_response");
+            this.activity.startActivityForResult(intent, REQUEST_CODE);
             LOGGER.log(Level.SEVERE, "payment");
             result.success(true);
         }
