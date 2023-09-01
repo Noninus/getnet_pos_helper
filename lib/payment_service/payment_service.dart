@@ -14,7 +14,7 @@ class PaymentService {
 
   checkout(String amount, String paymentType, String callerId) async {
     try {
-      _messagesChannel.setMethodCallHandler((call) async {
+      const MethodChannel("sagres_mobile_channel").setMethodCallHandler((call) async {
         switch (call.method) {
           case "checkoutCallback":
             var uri = Uri.parse(call.arguments);
