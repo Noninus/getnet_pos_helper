@@ -18,27 +18,25 @@ class PaymentService {
           .setMethodCallHandler((call) async {
         switch (call.method) {
           case "checkoutCallback":
-            var uri = Uri.parse(call.arguments);
             GetNetPaymentResponse paymentResponse = GetNetPaymentResponse(
-                code: uri.queryParameters['code'],
-                amount: uri.queryParameters['amount'],
-                itk: uri.queryParameters['itk'],
-                type: uri.queryParameters['type'],
-                installmentCount: uri.queryParameters['installment_count'],
-                brand: uri.queryParameters['brand'],
-                entryMode: uri.queryParameters['entry_mode'],
-                atk: uri.queryParameters['atk'],
-                pan: uri.queryParameters['pan'],
-                authorizationCode: uri.queryParameters['authorization_code'],
+                code: call.arguments['code'],
+                amount: call.arguments['amount'],
+                itk: call.arguments['itk'],
+                type: call.arguments['type'],
+                installmentCount: call.arguments['installment_count'],
+                brand: call.arguments['brand'],
+                entryMode: call.arguments['entry_mode'],
+                atk: call.arguments['atk'],
+                pan: call.arguments['pan'],
+                authorizationCode: call.arguments['authorization_code'],
                 authorizationDateTime:
-                    uri.queryParameters['authorization_date_time'],
-                success:
-                    uri.queryParameters['success'] == "true" ? true : false,
-                message: uri.queryParameters['success'] == "true"
+                    call.arguments['authorization_date_time'],
+                success: call.arguments['success'] == "true" ? true : false,
+                message: call.arguments['success'] == "true"
                     ? "OK"
-                    : uri.queryParameters['message'],
-                reason: uri.queryParameters['reason'],
-                responseCode: uri.queryParameters['response_code']);
+                    : call.arguments['message'],
+                reason: call.arguments['reason'],
+                responseCode: call.arguments['response_code']);
             _controller.add(paymentResponse);
             break;
           default:
