@@ -18,25 +18,7 @@ class PaymentService {
           .setMethodCallHandler((call) async {
         switch (call.method) {
           case "checkoutCallback":
-            GetNetPaymentResponse paymentResponse = GetNetPaymentResponse(
-                code: call.arguments['code'],
-                amount: call.arguments['amount'],
-                itk: call.arguments['itk'],
-                type: call.arguments['type'],
-                installmentCount: call.arguments['installment_count'],
-                brand: call.arguments['brand'],
-                entryMode: call.arguments['entry_mode'],
-                atk: call.arguments['atk'],
-                pan: call.arguments['pan'],
-                authorizationCode: call.arguments['authorization_code'],
-                authorizationDateTime:
-                    call.arguments['authorization_date_time'],
-                success: call.arguments['success'] == "true" ? true : false,
-                message: call.arguments['success'] == "true"
-                    ? "OK"
-                    : call.arguments['message'],
-                reason: call.arguments['reason'],
-                responseCode: call.arguments['response_code']);
+            GetNetPaymentResponse paymentResponse = GetNetPaymentResponse();
             _controller.add(paymentResponse);
             break;
           default:
