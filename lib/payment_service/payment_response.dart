@@ -1,4 +1,4 @@
-class PaymentResponse {
+class GetNetPaymentResponse {
   String? code;
   String? amount;
   String? itk;
@@ -15,7 +15,7 @@ class PaymentResponse {
   String? responseCode;
   String? message;
 
-  PaymentResponse({
+  GetNetPaymentResponse({
     this.code,
     this.amount,
     this.itk,
@@ -33,7 +33,7 @@ class PaymentResponse {
     this.message,
   });
 
-  PaymentResponse.fromJson(Map<String, dynamic> json) {
+  GetNetPaymentResponse.fromJson(Map<String, dynamic> json) {
     code = json['code'];
     amount = json['amount'];
     itk = json['itk'];

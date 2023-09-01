@@ -5,20 +5,21 @@ import 'package:getnet_pos_helper/payment_service/payment_response.dart';
 class PaymentService {
   final MethodChannel _messagesChannel;
 
-  static final StreamController<PaymentResponse> _controller =
+  static final StreamController<GetNetPaymentResponse> _controller =
       StreamController.broadcast();
 
-  Stream<PaymentResponse> get streamData => _controller.stream;
+  Stream<GetNetPaymentResponse> get streamData => _controller.stream;
 
   PaymentService(this._messagesChannel);
 
   checkout(String amount, String paymentType, String callerId) async {
     try {
-      const MethodChannel("sagres_mobile_channel").setMethodCallHandler((call) async {
+      const MethodChannel("sagres_mobile_channel")
+          .setMethodCallHandler((call) async {
         switch (call.method) {
           case "checkoutCallback":
             var uri = Uri.parse(call.arguments);
-            PaymentResponse paymentResponse = PaymentResponse(
+            GetNetPaymentResponse paymentResponse = GetNetPaymentResponse(
                 code: uri.queryParameters['code'],
                 amount: uri.queryParameters['amount'],
                 itk: uri.queryParameters['itk'],
@@ -44,7 +45,7 @@ class PaymentService {
         }
       });
     } on PlatformException catch (e) {
-      _controller.add(PaymentResponse(
+      _controller.add(GetNetPaymentResponse(
           success: false,
           message: e.toString(),
           reason: "platError",
@@ -58,7 +59,7 @@ class PaymentService {
         'callerId': callerId
       });
     } on PlatformException catch (e) {
-      _controller.add(PaymentResponse(
+      _controller.add(GetNetPaymentResponse(
           success: false,
           message: e.toString(),
           reason: "erro ao enviar deeplink",

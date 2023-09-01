@@ -47,7 +47,7 @@ class MyHomePageState extends State<MyHomePage> {
   initGet() async {
     await GetnetPos.init();
     subscription = GetnetPos.checkoutStreamListen
-        .listen((PaymentResponse paymentResponse) {
+        .listen((GetNetPaymentResponse paymentResponse) {
       print("===== CALLBACK ${paymentResponse.success} =======");
       SchedulerBinding.instance.addPostFrameCallback((_) {
         setState(() {

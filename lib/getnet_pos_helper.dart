@@ -57,6 +57,6 @@ class GetnetPos {
   }
 
   /// Stream do checkout
-  static Stream<PaymentResponse> get checkoutStreamListen =>
+  static Stream<GetNetPaymentResponse> get checkoutStreamListen =>
       _paymentService.streamData;
 }
