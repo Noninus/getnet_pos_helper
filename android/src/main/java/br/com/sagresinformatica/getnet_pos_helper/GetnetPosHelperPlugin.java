@@ -192,18 +192,16 @@ public class GetnetPosHelperPlugin implements ActivityAware, FlutterPlugin, Meth
      * @param result - result callback
      */
     private void initialize(MethodCall call, Result result) {
-        LOGGER.log(Level.SEVERE, "initialize");
         if (call.method.equals("initialize")) {
             registerPosDigital(new Callback() {
                 @Override
                 public void performAction() {
-                    LOGGER.info("Initialized!");
+                    result.success("Initialized!");
                 }
 
                 @Override
                 public void onError(String message) {
-                    LOGGER.info("GetnetPosHelperPlugin onError");
-                    LOGGER.log(Level.SEVERE, message);
+                    result.error("Error on initialize", message, null);
                 }
             });
         }
