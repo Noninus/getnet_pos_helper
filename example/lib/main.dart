@@ -48,10 +48,10 @@ class MyHomePageState extends State<MyHomePage> {
     await GetnetPos.init();
     subscription = GetnetPos.checkoutStreamListen
         .listen((GetNetPaymentResponse paymentResponse) {
-      print("===== CALLBACK ${paymentResponse.success} =======");
+      print("===== CALLBACK ${paymentResponse.result} =======");
       SchedulerBinding.instance.addPostFrameCallback((_) {
         setState(() {
-          paymentStatus = paymentResponse.message;
+          paymentStatus = paymentResponse.resultDetails;
         });
       });
     });

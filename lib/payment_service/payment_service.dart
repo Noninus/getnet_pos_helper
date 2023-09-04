@@ -18,7 +18,31 @@ class PaymentService {
           .setMethodCallHandler((call) async {
         switch (call.method) {
           case "checkoutCallback":
-            GetNetPaymentResponse paymentResponse = GetNetPaymentResponse();
+            List<String> arguments = call.arguments.toString().split(',');
+            GetNetPaymentResponse paymentResponse = GetNetPaymentResponse(
+              result: arguments[0],
+              resultDetails: arguments[1],
+              amount: arguments[2],
+              callerId: arguments[3],
+              nsu: arguments[4],
+              nsuLastSuccesfullMessage: arguments[5],
+              cvNumber: arguments[6],
+              type: arguments[7],
+              brand: arguments[8],
+              inputType: arguments[9],
+              installments: arguments[10],
+              gmtDateTime: arguments[11],
+              nsuLocal: arguments[12],
+              authorizationCode: arguments[13],
+              cardBin: arguments[14],
+              cardLastDigits: arguments[15],
+              extraScreensResult: arguments[16],
+              cardholderName: arguments[17],
+              automationSlip: arguments[18],
+              printMerchantPreference: arguments[19],
+              orderId: arguments[20],
+              pixPayloadResponse: arguments[21],
+            );
             _controller.add(paymentResponse);
             break;
           default:
@@ -26,10 +50,9 @@ class PaymentService {
       });
     } on PlatformException catch (e) {
       _controller.add(GetNetPaymentResponse(
-          success: false,
-          message: e.toString(),
-          reason: "platError",
-          responseCode: "9999"));
+        result: "erro",
+        resultDetails: e.toString(),
+      ));
     }
     try {
       await _messagesChannel.invokeMethod('payment', {
@@ -40,10 +63,9 @@ class PaymentService {
       });
     } on PlatformException catch (e) {
       _controller.add(GetNetPaymentResponse(
-          success: false,
-          message: e.toString(),
-          reason: "erro ao enviar deeplink",
-          responseCode: "9998"));
+        result: "erro",
+        resultDetails: e.toString(),
+      ));
     }
   }
 }
