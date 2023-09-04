@@ -167,6 +167,7 @@ class MyHomePageState extends State<MyHomePage> {
         .catchError((e) => setState(() {
               printerStatus = 'Error: ${e.code} -> ${e.message}';
             }));
+    GetnetPos.printJumpLines(4);
   }
 
   void payment() {

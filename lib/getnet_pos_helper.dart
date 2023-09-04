@@ -31,6 +31,29 @@ class GetnetPos {
   /// Print a list of strings.
   /// Uses the qrCodePattern to match the qrCode. If matches the qrcode is printed.
   /// Uses the barcodePattern to match the barcode. If matches the barcode is printed.
+  static Future<void> printJumpLines(
+    int numberRows, {
+    String qrCodePattern = '(\\d{44}\\|.*\$)',
+    String barcodePattern = '^\\d{1,}.\$',
+    bool printBarcode = false,
+  }) async {
+    List<String> rows = [];
+
+    for (var i = 0; i < numberRows; i++) {
+      rows.add(" ");
+    }
+
+    await _channel.invokeMethod('print', {
+      'list': rows,
+      'qrCodePattern': qrCodePattern,
+      'barcodePattern': barcodePattern,
+      'printBarcode': printBarcode,
+    });
+  }
+
+  /// Print a list of strings.
+  /// Uses the qrCodePattern to match the qrCode. If matches the qrcode is printed.
+  /// Uses the barcodePattern to match the barcode. If matches the barcode is printed.
   static Future<void> printImage(
     List<String> list, {
     String qrCodePattern = '(\\d{44}\\|.*\$)',
