@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:getnet_pos_helper/getnet_pos_helper.dart';
 import 'package:getnet_pos_helper/payment_service/payment_response.dart';
+import 'package:getnet_pos_helper_example/img_string.dart';
 
 void main() => runApp(const MyApp());
 
@@ -82,6 +83,9 @@ class MyHomePageState extends State<MyHomePage> {
             ElevatedButton(
                 onPressed: () => checkService(),
                 child: const Text("checkService()")),
+            ElevatedButton(
+                onPressed: () => printImage(),
+                child: const Text("printImage()")),
             LabeledValue('Service Status', serviceStatus ?? ""),
             LabeledValue('Printer:', printerStatus ?? ""),
             LabeledValue('Mifare:', mifareStatus ?? ""),
@@ -138,6 +142,23 @@ class MyHomePageState extends State<MyHomePage> {
         "Header is the first line",
         "Content line 1",
         "Content line 2",
+      ],
+    )
+        .then((_) => setState(() {
+              printerStatus = 'Normal';
+            }))
+        .catchError((e) => setState(() {
+              printerStatus = 'Error: ${e.code} -> ${e.message}';
+            }));
+  }
+
+  void printImage() {
+    setState(() {
+      printerStatus = null;
+    });
+    GetnetPos.printImage(
+      [
+        imgString340Cubic,
       ],
     )
         .then((_) => setState(() {

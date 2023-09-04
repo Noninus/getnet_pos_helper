@@ -2,15 +2,13 @@
 
 A new Flutter plugin project.
 
-## Getting Started
+## Setup
 
-This project is a starting point for a Flutter
-[plug-in package](https://flutter.dev/developing-packages/),
-a specialized package that includes platform-specific implementation code for
-Android and/or iOS.
+### Como fazer funcionar o deeplink do pagamento
 
-For help getting started with Flutter development, view the
-[online documentation](https://flutter.dev/docs), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+Esse projeto não funcionou muito bem o retorno do deeplink do pagamento, tentei 3 semanas fazer funcionar utilizando uma lib
+e simplesmente desisti!
 
-# getnet_pos_helper
+Para funcionar fiz uma alteração no projeto que vai ser utilizado, nesse exemplo Sagres Mobile, MainActivity.kt
+
+Lá coloquei o codigo que recebe o retorno do deep link e fucnionou, lembrando que tem que que ser no method channel que está lá também, se não, não vai funcionar!

@@ -34,6 +34,9 @@ import androidx.annotation.NonNull;
 import android.util.Log;
 
 import io.flutter.plugin.common.PluginRegistry.NewIntentListener;
+import android.util.Base64;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 
 /**
  * GetnetPosHelperPlugin
@@ -159,6 +162,7 @@ public class GetnetPosHelperPlugin implements ActivityAware, FlutterPlugin, Meth
         checkService(call, result);
         payment(call, result);
         initialize(call, result);
+        printImage(call, result);
     }
 
     /**
@@ -270,6 +274,41 @@ public class GetnetPosHelperPlugin implements ActivityAware, FlutterPlugin, Meth
     }
 
     /**
+     * Print
+     *
+     * @param call   - method call
+     * @param result - result callback
+     */
+    private void printImage(final MethodCall call, final Result result) {
+        if (call.method.equals("printImage")) {
+            ensureInitialized(new Callback() {
+                @Override
+                public void performAction() {
+                    List<String> lines = call.argument(LIST);
+                    String qrCodePattern = call.argument(QR_CODE_PATTERN);
+                    String barCodePattern = call.argument(BARCODE_PATTERN);
+                    boolean printBarcode = call.argument(PRINT_BARCODE);
+                    if (lines != null && !lines.isEmpty()) {
+                        try {
+                            addImageToPrinter(lines, qrCodePattern, barCodePattern, printBarcode);
+                            callPrintMethod(result);
+                        } catch (Exception e) {
+                            result.error("Error on print", e.getMessage(), null);
+                        }
+                    } else {
+                        result.error("Arguments are missed [list, qrCodePattern, barcodePattern]", null, null);
+                    }
+                }
+
+                @Override
+                public void onError(String message) {
+                    result.error("print", message, null);
+                }
+            });
+        }
+    }
+
+    /**
      * Invoke print method and set status of operation on result callback
      *
      * @param result - result for handler the status
@@ -315,6 +354,23 @@ public class GetnetPosHelperPlugin implements ActivityAware, FlutterPlugin, Meth
                 } else {
                     PosDigital.getInstance().getPrinter().addText(AlignMode.LEFT, line);
                 }
+            }
+        }
+    }
+
+    /**
+     * Add a list of string to the printer buffer
+     *
+     * @param lines - linest to be printed
+     * @throws RemoteException - if printer is not available
+     */
+    private void addImageToPrinter(List<String> lines, String qrCodePattern, String barcodePattern, boolean printBarCode) throws RemoteException {
+        PosDigital.getInstance().getPrinter().init();
+        for (String text : lines) {
+            for (String line : text.split("\n")) {
+                byte[] decodedString = Base64.decode(line, Base64.DEFAULT);
+                Bitmap decodedByte = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
+                PosDigital.getInstance().getPrinter().addImageBitmap(AlignMode.CENTER, decodedByte);
             }
         }
     }
