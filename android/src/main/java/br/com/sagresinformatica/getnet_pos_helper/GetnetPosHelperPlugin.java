@@ -291,6 +291,10 @@ public class GetnetPosHelperPlugin implements ActivityAware, FlutterPlugin, Meth
                     if (lines != null && !lines.isEmpty()) {
                         try {
                             addImageToPrinter(lines, qrCodePattern, barCodePattern, printBarcode);
+                            addTextToPrinter([" "], qrCodePattern, barCodePattern, printBarcode);
+                            addTextToPrinter([" "], qrCodePattern, barCodePattern, printBarcode);
+                            addTextToPrinter([" "], qrCodePattern, barCodePattern, printBarcode);
+                            addTextToPrinter([" "], qrCodePattern, barCodePattern, printBarcode);
                             callPrintMethod(result);
                         } catch (Exception e) {
                             result.error("Error on print", e.getMessage(), null);
