@@ -56,16 +56,22 @@ class GetnetPos {
   /// Uses the barcodePattern to match the barcode. If matches the barcode is printed.
   static Future<void> printImage(
     List<String> list, {
+    int jumpLines = 4,
     String qrCodePattern = '(\\d{44}\\|.*\$)',
     String barcodePattern = '^\\d{1,}.\$',
     bool printBarcode = false,
-  }) async =>
-      await _channel.invokeMethod('printImage', {
-        'list': list,
-        'qrCodePattern': qrCodePattern,
-        'barcodePattern': barcodePattern,
-        'printBarcode': printBarcode,
-      });
+  }) async {
+    for (var i = 0; i < jumpLines; i++) {
+      list.add(" ");
+    }
+
+    await _channel.invokeMethod('printImage', {
+      'list': list,
+      'qrCodePattern': qrCodePattern,
+      'barcodePattern': barcodePattern,
+      'printBarcode': printBarcode,
+    });
+  }
 
   /// Returns the card serial number from Mifare
   static Future<String> getMifareCardSN() async =>
