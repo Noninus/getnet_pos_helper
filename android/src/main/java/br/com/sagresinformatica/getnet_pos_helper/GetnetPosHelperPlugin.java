@@ -366,9 +366,14 @@ public class GetnetPosHelperPlugin implements ActivityAware, FlutterPlugin, Meth
         PosDigital.getInstance().getPrinter().init();
         for (String text : lines) {
             for (String line : text.split("\n")) {
-                byte[] decodedString = Base64.decode(line, Base64.DEFAULT);
-                Bitmap decodedByte = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
-                PosDigital.getInstance().getPrinter().addImageBitmap(AlignMode.CENTER, decodedByte);
+                if (line.length() < 5){
+                    PosDigital.getInstance().getPrinter().addText(AlignMode.LEFT, line);
+                }else{
+                    byte[] decodedString = Base64.decode(line, Base64.DEFAULT);
+                    Bitmap decodedByte = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
+                    PosDigital.getInstance().getPrinter().addImageBitmap(AlignMode.CENTER, decodedByte);
+                }
+              
             }
         }
     }

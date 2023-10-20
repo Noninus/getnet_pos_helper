@@ -56,7 +56,7 @@ class GetnetPos {
   /// Uses the barcodePattern to match the barcode. If matches the barcode is printed.
   static Future<void> printImage(
     List<String> list, {
-    int jumpLines = 4,
+    int jumpLines = 2,
     String qrCodePattern = '(\\d{44}\\|.*\$)',
     String barcodePattern = '^\\d{1,}.\$',
     bool printBarcode = false,
